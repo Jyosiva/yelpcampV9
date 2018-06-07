@@ -76,19 +76,19 @@ router.get('/:id/edit',function(req,res){
 
 //Update campground
 
-router.put('/campground/:id',function(req,res){
+router.put('/:id',function(req,res){
 
-  //console.log('inside update route');
+  console.log('inside update route');
     yelp.findByIdAndUpdate(req.params.id,req.body.campground,function(err,updatedcamp){
-        
+        console.log(req.body.campground);
         if(err){
             res.redirect('/campground');
 
         }
 
-        else
-        res.redirect('/campground/'+req.params.id);
-
+        else{
+        res.redirect('/campground/' + req.params.id);
+        }
 
 
     });
