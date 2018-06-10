@@ -3,6 +3,8 @@ var express=require('express');
 var router=express.Router();
 
 var yelp=require('../models/yelp');
+var middleware=require('../middleware');
+
 //Campground routes
 
 
@@ -14,13 +16,13 @@ yelp.find({},function(err,allcamp){
 
 });
 
-router.get('/new',isLoggedIn,function(req,res){
+router.get('/new',middleware.isLoggedIn,function(req,res){
 
     res.render('campground/new');
 
 });
 
-router.post('/',isLoggedIn,function(req,res){
+router.post('/',middleware.isLoggedIn,function(req,res){
 
     var name=req.body.name;
     var image=req.body.image;
@@ -61,7 +63,7 @@ router.get('/:id',function(req,res){
 
 //Edit Campground
 
-router.get('/:id/edit',checkAuthorized,function(req,res){
+router.get('/:id/edit',middleware.checkAuthorized,function(req,res){
 
     yelp.findById(req.params.id,function(err,camp){
 
@@ -76,7 +78,7 @@ router.get('/:id/edit',checkAuthorized,function(req,res){
 
 //Update campground
 
-router.put('/:id',function(req,res){
+router.put('/:id',middleware.checkAuthorized,function(req,res){
 
   console.log('inside update route');
     yelp.findByIdAndUpdate(req.params.id,req.body.campground,function(err,updatedcamp){
@@ -97,7 +99,7 @@ router.put('/:id',function(req,res){
 
 //Destroy campground
 
-router.delete('/:id',checkAuthorized,function(req,res){
+router.delete('/:id',middleware.checkAuthorized,function(req,res){
 
     yelp.findByIdAndRemove(req.params.id,function(err,deletedcamp){
      
@@ -113,33 +115,6 @@ router.delete('/:id',checkAuthorized,function(req,res){
 
 
 
-function checkAuthorized(req,res,next){
-
-    if(req.isAuthenticated()){
-        yelp.findById(req.params.id,function(err,foundCamp){
-         
-            if(foundCamp.author.id.equals(req.user._id))
-            {
-                next();
-            }
-           else{
-               res.redirect("back");
-           }
-        });
-    }
-    else
-    {
-        res.redirect("back");
-    }  
-}
-
-function isLoggedIn(req,res,next){
-
-    if(req.isAuthenticated()){
-        return next();
-    }
-   res.redirect('/login');
-}
 
 
 module.exports=router;

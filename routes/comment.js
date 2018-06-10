@@ -3,12 +3,13 @@ var router=express.Router({mergeParams:true});
 
 var yelp=require('../models/yelp');
 var comments=require('../models/comment');
+var middleware=require('../middleware');
 
 //==============================================
 //COMMENTS ROUTES
 //===============================================
 
-router.get('/new',isLoggedIn,function(req,res){
+router.get('/new',middleware.isLoggedIn,function(req,res){
 
     yelp.findById(req.params.id,function(err,selectedcamp){
     
@@ -21,7 +22,7 @@ router.get('/new',isLoggedIn,function(req,res){
     });
      });
     
-     router.post('/',isLoggedIn,function(req,res){
+     router.post('/',middleware.isLoggedIn,function(req,res){
          
     
         yelp.findById(req.params.id,function(err,camp){
@@ -49,7 +50,7 @@ router.get('/new',isLoggedIn,function(req,res){
 
      //Comments edit route
 
-    router.get('/:comment_id/edit',checkAuthorizedComment,function(req,res){
+    router.get('/:comment_id/edit',middleware.checkAuthorizedComment,function(req,res){
 
         comments.findById(req.params.comment_id,function(err,foundcom){
             if(err){
@@ -69,7 +70,7 @@ router.get('/new',isLoggedIn,function(req,res){
 
     //comments update route
 
-    router.put('/:comment_id',function(req,res){
+    router.put('/:comment_id',middleware.checkAuthorizedComment,function(req,res){
 
         comments.findByIdAndUpdate(req.params.comment_id,req.body.comment,function(err,updatedcom){
 
@@ -88,7 +89,7 @@ router.get('/new',isLoggedIn,function(req,res){
 
     });
 
-    router.delete("/:comment_id",checkAuthorizedComment,function(req,res){
+    router.delete("/:comment_id",middleware.checkAuthorizedComment,function(req,res){
 
         comments.findByIdAndRemove(req.params.comment_id,function(err,deletedcomm){
 
@@ -101,37 +102,8 @@ router.get('/new',isLoggedIn,function(req,res){
         });
     });
 
-    function checkAuthorizedComment(req,res,next){
-
-        if(req.isAuthenticated()){
-            yelp.findById(req.params.comment_id,function(err,foundCom){
-             
-                if(foundCom.author.id.equals(req.user._id))
-                {
-                    next();
-                }
-               else{
-                   res.redirect("back");
-               }
-            });
-        }
-        else
-        {
-            res.redirect("back");
-        }  
-    }
+    
      
-
-     function isLoggedIn(req,res,next){
-
-        if(req.isAuthenticated()){
-            return next();
-        }
-       res.redirect('/login');
-    }
-    
-    
-
 
      module.exports=router;
     
