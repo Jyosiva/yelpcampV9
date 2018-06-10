@@ -61,7 +61,7 @@ router.get('/:id',function(req,res){
 
 //Edit Campground
 
-router.get('/:id/edit',function(req,res){
+router.get('/:id/edit',checkAuthorized,function(req,res){
 
     yelp.findById(req.params.id,function(err,camp){
 
@@ -80,7 +80,7 @@ router.put('/:id',function(req,res){
 
   console.log('inside update route');
     yelp.findByIdAndUpdate(req.params.id,req.body.campground,function(err,updatedcamp){
-        console.log(req.body.campground);
+        //console.log(req.body.campground);
         if(err){
             res.redirect('/campground');
 
@@ -97,7 +97,7 @@ router.put('/:id',function(req,res){
 
 //Destroy campground
 
-router.delete('/:id',function(req,res){
+router.delete('/:id',checkAuthorized,function(req,res){
 
     yelp.findByIdAndRemove(req.params.id,function(err,deletedcamp){
      
@@ -112,6 +112,26 @@ router.delete('/:id',function(req,res){
 
 
 
+
+function checkAuthorized(req,res,next){
+
+    if(req.isAuthenticated()){
+        yelp.findById(req.params.id,function(err,foundCamp){
+         
+            if(foundCamp.author.id.equals(req.user._id))
+            {
+                next();
+            }
+           else{
+               res.redirect("back");
+           }
+        });
+    }
+    else
+    {
+        res.redirect("back");
+    }  
+}
 
 function isLoggedIn(req,res,next){
 
