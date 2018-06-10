@@ -2,7 +2,7 @@ var express= require('express');
 var app=express();
 var bodyParser=require('body-parser');
 var mongoose=require('mongoose');
-
+var flash=require('connect-flash');
 var passport=require('passport');
 var LocalStrategy=require('passport-local');
 var methodOverride= require('method-override');
@@ -40,6 +40,8 @@ app.use(passport.session());
 
 app.use(function(req,res,next){
     res.locals.currentuser=req.user;
+    req.locals.error=req.flash("error");
+    req.locals.success=req.flash("success");
     next();
 });
 app.use('/',indexroutes);

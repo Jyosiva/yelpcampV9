@@ -55,15 +55,10 @@ function(req,res){
 router.get('/logout',function(req,res){
 
     req.logout();
+    req.flash("success","Logged you out!!");
     res.redirect('/campground');
 });
 
-function isLoggedIn(req,res,next){
 
-    if(req.isAuthenticated()){
-        return next();
-    }
-   res.redirect('/login');
-}
 
 module.exports=router;
