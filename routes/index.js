@@ -26,7 +26,7 @@ User.register(newuser,req.body.password,function(err,user){
     if(err)
 
     {
-        console.log(err);
+        req.flash("error", err.message);
         return res.render('register');
     }   
     //console.log("inside post register");
